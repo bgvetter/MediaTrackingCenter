@@ -20,6 +20,7 @@ public class albumDataModel extends AbstractTableModel {
         setup();
     }
 
+    //get row and column counts
     private void setup(){
 
         countRows();
@@ -33,10 +34,11 @@ public class albumDataModel extends AbstractTableModel {
 
     }
 
-
+    //update data model with new record set
     public void updateResultSet(ResultSet newRS){
         resultSet = newRS;
         setup();
+        fireTableDataChanged();
     }
 
 

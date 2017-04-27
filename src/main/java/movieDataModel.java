@@ -1,14 +1,12 @@
 import javax.swing.table.AbstractTableModel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by sylentbv on 4/19/2017.
  */
-public class movieDataModel extends AbstractTableModel {
+public class movieDataModel extends AbstractTableModel  {
 
     private int rowCount = 0;
     private int colCount = 0;
@@ -20,6 +18,7 @@ public class movieDataModel extends AbstractTableModel {
         setup();
     }
 
+    //get row and column counts
     private void setup(){
 
         countRows();
@@ -33,10 +32,11 @@ public class movieDataModel extends AbstractTableModel {
 
     }
 
-
+    //update data model with new record set
     public void updateResultSet(ResultSet newRS){
         resultSet = newRS;
         setup();
+        fireTableDataChanged();
     }
 
 
