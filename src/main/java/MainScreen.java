@@ -51,6 +51,7 @@ public class MainScreen extends JFrame implements WindowListener{
     private JButton saveAlbumButton;
     private JButton cancelAlbumButton;
     private JTabbedPane tabbedPanel;
+    private JScrollPane resultsScrollPane;
 
     dbAccess mainDB;
     int updateID;
@@ -186,16 +187,32 @@ public class MainScreen extends JFrame implements WindowListener{
                     case "Movie":
                         mainDB.searchMovies(searchText,searchGenre);
                         resultsJT.setModel(mainDB.movieDM);
+                        String[] movieColumnNames = {"ID", "Movie Name","Movie Type",
+                                "Director","Genre","Description",
+                                "Actor 1","Actor 2","Actor 3", "Date Added"};
+                        for(int i=0;i<movieColumnNames.length;i++){
+                            resultsJT.getColumnModel().getColumn(i).setHeaderValue(movieColumnNames[i]);
+                        }
                         setSize(new Dimension(800, 400));
                         break;
                     case "Book":
                         mainDB.searchBooks(searchText,searchGenre);
                         resultsJT.setModel(mainDB.bookDM);
+                        String[] bookColumnNames = {"ID", "Book Name","Author",
+                                "Genre","ISBN","Description","Date Added"};
+                        for(int i=0;i<bookColumnNames.length;i++){
+                            resultsJT.getColumnModel().getColumn(i).setHeaderValue(bookColumnNames[i]);
+                        }
                         setSize(new Dimension(650, 400));
                         break;
                     case "Album":
                         mainDB.searchAlbums(searchText,searchGenre);
                         resultsJT.setModel(mainDB.albumDM);
+                        String[] albumColumnNames = {"ID", "Album Name","Artist",
+                                "Genre","Description", "Date Added"};
+                        for(int i=0;i<albumColumnNames.length;i++){
+                            resultsJT.getColumnModel().getColumn(i).setHeaderValue(albumColumnNames[i]);
+                        }
                         setSize(new Dimension(500, 400));
                         break;
                 }
