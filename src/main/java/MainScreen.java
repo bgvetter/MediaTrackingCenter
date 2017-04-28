@@ -5,11 +5,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by sylentbv on 4/25/2017.
  */
 public class MainScreen extends JFrame implements WindowListener{
+    //controls
     private JPanel rootPanel;
     private JComboBox mediaTypeCB;
     private JButton addNewButton;
@@ -51,6 +53,7 @@ public class MainScreen extends JFrame implements WindowListener{
     private JTabbedPane tabbedPanel;
 
     dbAccess mainDB;
+    int updateID;
 
 
     MainScreen(){
@@ -119,6 +122,8 @@ public class MainScreen extends JFrame implements WindowListener{
                 //call tab for appropriate selected media type
 
                 String searchMediaType = searchMediaTypeCB.getSelectedItem().toString();
+                //set update id to -1 for new
+                updateID = -1;
 
                 switch (searchMediaType){
                     case "Movie":
@@ -148,6 +153,8 @@ public class MainScreen extends JFrame implements WindowListener{
 
                 //call tab for appropriate selected media type
                 String searchMediaType = searchMediaTypeCB.getSelectedItem().toString();
+                //set update id to current row id
+                updateID = currentRow;
 
                 switch (searchMediaType){
                     case "Movie":
@@ -250,6 +257,102 @@ public class MainScreen extends JFrame implements WindowListener{
                 switchTabs(0,3);
             }
         });
+
+        saveMovieButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fMovieName = movieNameTF.getText();
+                if(fMovieName.length()==0){
+                    System.out.println("Please enter a movie name!");
+                    return;
+                }
+                String fMovieType = movieTypeCB.getSelectedItem().toString();
+                String fDirector = directorTF.getText();
+                String fGenre = movieGenreCB.getSelectedItem().toString();
+                String fDescription = movieDescriptionTF.getText();
+                String fActor1 = actor1TF.getText();
+                String fActor2 = actor2TF.getText();
+                String fActor3 = actor3TF.getText();
+                java.util.Date date = new java.util.Date();
+                Date fDateAdded = new java.sql.Date(date.getTime());
+
+                if(updateID==-1){
+                    //new record
+                    mainDB.movieDM.insertRow(fMovieName,fMovieType,fDirector,fGenre,
+                            fDescription,fActor1,fActor2,fActor3,fDateAdded);
+                }
+                else{
+                    //update existing record
+                    mainDB.movieDM.updateRow(updateID,fMovieName,fMovieType,fDirector,
+                            fGenre,fDescription,fActor1,fActor2,fActor3);
+                }
+
+                clearMovieData();
+                switchTabs(0,1);
+            }
+        });
+
+        saveBookButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fBookName = bookNameTF.getText();
+                if(fBookName.length()==0){
+                    System.out.println("Please enter a book name!");
+                    return;
+                }
+                String fAuthor = authorTF.getText();
+                String fGenre = bookGenreCB.getSelectedItem().toString();
+                String fDescription = bookDescriptionTF.getText();
+                String fISBN = isbnTF.getText();
+                java.util.Date date = new java.util.Date();
+                Date fDateAdded = new java.sql.Date(date.getTime());
+
+                if(updateID==-1){
+                    //new record
+                    mainDB.bookDM.insertRow(fBookName,fAuthor,fGenre,fDescription,fISBN,fDateAdded);
+                }
+                else{
+                    //update existing record
+                    mainDB.bookDM.updateRow(updateID,fBookName,fAuthor,fGenre,fDescription,fISBN);
+                }
+
+                clearMovieData();
+                switchTabs(0,2);
+            }
+        });
+
+        saveAlbumButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fAlbumName = albumNameTF.getText();
+                if(fAlbumName.length()==0){
+                    System.out.println("Please enter a album name!");
+                    return;
+                }
+                String fArtist = artistTF.getText();
+                if(fArtist.length()==0){
+                    System.out.println("Please enter an artist!");
+                    return;
+                }
+                String fGenre = albumGenreCB.getSelectedItem().toString();
+                String fDescription = albumDescriptionTF.getText();
+                java.util.Date date = new java.util.Date();
+                Date fDateAdded = new java.sql.Date(date.getTime());
+
+                if(updateID==-1){
+                    //new record
+                    mainDB.albumDM.insertRow(fAlbumName,fArtist,fGenre,fDescription,fDateAdded);
+                }
+                else{
+                    //update existing record
+                    mainDB.albumDM.updateRow(updateID,fAlbumName,fArtist,fGenre,fDescription);
+                }
+
+                clearMovieData();
+                switchTabs(0,2);
+            }
+        });
+
     }
 
     //populate fields with selected record
