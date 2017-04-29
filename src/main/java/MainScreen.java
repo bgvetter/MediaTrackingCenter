@@ -75,6 +75,9 @@ public class MainScreen extends JFrame implements WindowListener{
     private JButton closeButton;
     private JButton viewIMDBInfoButton;
     private JButton lookUpBookButton;
+    private JButton lookUpAlbumButton;
+    private JButton webInfoAlbumButton;
+    private JTextField albumInfoURLTF;
 
     dbAccess mainDB;
     int updateID;
@@ -232,7 +235,7 @@ public class MainScreen extends JFrame implements WindowListener{
                         mainDB.searchAlbums(searchText,searchGenre);
                         resultsJT.setModel(mainDB.albumDM);
                         String[] albumColumnNames = {"ID", "Album Name","Artist",
-                                "Genre","Description", "Date Added"};
+                                "Genre","Description", "Album Info URL", "Date Added"};
                         for(int i=0;i<albumColumnNames.length;i++){
                             resultsJT.getColumnModel().getColumn(i).setHeaderValue(albumColumnNames[i]);
                         }
@@ -392,18 +395,19 @@ public class MainScreen extends JFrame implements WindowListener{
                 String fDescription = albumDescriptionTF.getText();
                 java.util.Date date = new java.util.Date();
                 Date fDateAdded = new java.sql.Date(date.getTime());
+                String fURL = albumInfoURLTF.getText();
 
                 if(updateID==-1){
                     //new record
-                    mainDB.albumDM.insertRow(fAlbumName,fArtist,fGenre,fDescription,fDateAdded);
+                    mainDB.albumDM.insertRow(fAlbumName,fArtist,fGenre,fDescription, fURL,fDateAdded);
                 }
                 else{
                     //update existing record
-                    mainDB.albumDM.updateRow(updateID,fAlbumName,fArtist,fGenre,fDescription);
+                    mainDB.albumDM.updateRow(updateID,fAlbumName,fArtist,fGenre,fDescription, fURL);
                 }
 
                 clearMovieData();
-                switchTabs(0,2);
+                switchTabs(0,3);
             }
         });
 
@@ -560,6 +564,80 @@ public class MainScreen extends JFrame implements WindowListener{
             }
         });
 
+        lookUpAlbumButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fAlbumName = albumNameTF.getText();
+                if(fAlbumName.length()==0){
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter an album name!");
+                    return;
+                }
+
+                String fArtistName = artistTF.getText();
+                if(fAlbumName.length()==0){
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter an artist name!");
+                    return;
+                }
+
+                String apiKey="";
+                //look up access key
+                try (BufferedReader reader = new BufferedReader(new FileReader("lastfmKey.txt"))){
+                    apiKey = reader.readLine();
+                }
+                catch (IOException ex){
+                    System.out.println(ex);
+                }
+
+                //set up http post call
+                HttpClient httpClient = new DefaultHttpClient();
+                try {
+                    String encodedAlbumName = URLEncoder.encode(fAlbumName,"UTF-8");
+                    String encodedArtistName = URLEncoder.encode(fArtistName,"UTF-8");
+
+                    //call last FM api for album info based upon title
+                    String url="http://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key="+apiKey+
+                            "&format=json&album="+encodedAlbumName+"&artist="+encodedArtistName;
+                    HttpPost request = new HttpPost(url);
+                    //get and parse response
+                    HttpResponse response = httpClient.execute(request);
+                    String jsonString = EntityUtils.toString(response.getEntity());
+                    JSONObject obj = new JSONObject(jsonString);
+
+                    JSONObject albumObj = obj.getJSONObject("album");
+
+                    String jURl = albumObj.getString("url");
+
+                    //assign values to fields
+                    albumInfoURLTF.setText(jURl);
+
+
+                }catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                } finally {
+                    httpClient.getConnectionManager().shutdown();
+                }
+            }
+        });
+
+        webInfoAlbumButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String urlString = albumInfoURLTF.getText();
+
+                if(urlString.length()<5) {
+                    JOptionPane.showMessageDialog(MainScreen.this, "Album Info needs to be looked up first!");
+                    return;
+                }
+
+                try {
+                    URL sAlbumInfo = new URL(urlString);
+                    openWebpage(sAlbumInfo.toURI());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
     }
 
     //Try to load the uri using the default pc browser
@@ -581,6 +659,7 @@ public class MainScreen extends JFrame implements WindowListener{
         artistTF.setText(mainDB.albumDM.getValueAt(iID,2).toString()+"");
         albumGenreCB.setSelectedItem(mainDB.albumDM.getValueAt(iID,3).toString()+"");
         albumDescriptionTF.setText(mainDB.albumDM.getValueAt(iID,4).toString()+"");
+        albumInfoURLTF.setText(mainDB.albumDM.getValueAt(iID,5).toString()+"");
     }
 
     private void setBookData(int iID) {
@@ -634,6 +713,7 @@ public class MainScreen extends JFrame implements WindowListener{
         albumGenreCB.setSelectedIndex(0);
         artistTF.setText("");
         albumDescriptionTF.setText("");
+        albumInfoURLTF.setText("");
     }
 
 

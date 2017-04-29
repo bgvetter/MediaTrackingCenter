@@ -123,6 +123,7 @@ public class dbAccess {
                             "Artist VARCHAR (100), " +
                             "Genre varchar(50), " +
                             "Description VARCHAR (1000), " +
+                            "albumURl varchar(200)," +
                             "DateAdded DateTime, " +
                             "PRIMARY KEY(ID) " +
                             ")";
@@ -217,8 +218,9 @@ public class dbAccess {
                         "Artist," +
                         "Genre," +
                         "Description," +
+                        "AlbumURL, " +
                         "DateAdded) " +
-                        "values(?,?,?,?,?)";
+                        "values(?,?,?,?,?,?)";
                 psInsert = conn.prepareStatement(sPreparedSQL);
 
                 //insert data
@@ -226,8 +228,9 @@ public class dbAccess {
                 psInsert.setString(2,"Nirvana");
                 psInsert.setString(3,"Grunge");
                 psInsert.setString(4,"Good");
+                psInsert.setString(5,"");
                 java.util.Date date = new java.util.Date();
-                psInsert.setDate(5,new java.sql.Date(date.getTime()));
+                psInsert.setDate(6,new java.sql.Date(date.getTime()));
                 psInsert.executeUpdate();
 
             }

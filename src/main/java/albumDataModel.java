@@ -101,7 +101,7 @@ public class albumDataModel extends AbstractTableModel {
 
     //returns true if successful, false if error occurs
     public boolean insertRow(String iAlbumName, String iArtist, String iGenre,
-                             String iDescription, Date DateAdded) {
+                             String iDescription, String iURL, Date DateAdded) {
 
         try {
             //Move to insert row, insert the appropriate data in each column, insert the row, move cursor back to where it was before we started
@@ -110,6 +110,7 @@ public class albumDataModel extends AbstractTableModel {
             resultSet.updateString("Artist", iArtist);
             resultSet.updateString("Genre", iGenre);
             resultSet.updateString("Description", iDescription);
+            resultSet.updateString("AlbumURL", iURL);
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
             resultSet.updateDate("DateAdded", (java.sql.Date) date);
@@ -129,7 +130,7 @@ public class albumDataModel extends AbstractTableModel {
 
     //updates an existing record in the recordset
     public boolean updateRow(int rowID, String iAlbumName, String iArtist, String iGenre,
-                             String iDescription) {
+                             String iDescription, String iURL) {
 
         try {
             resultSet.absolute(rowID+1);
@@ -137,6 +138,7 @@ public class albumDataModel extends AbstractTableModel {
             resultSet.updateString("Artist", iArtist);
             resultSet.updateString("Genre", iGenre);
             resultSet.updateString("Description", iDescription);
+            resultSet.updateString("AlbumURL", iURL);
             resultSet.updateRow();
             fireTableDataChanged();
             return true;
