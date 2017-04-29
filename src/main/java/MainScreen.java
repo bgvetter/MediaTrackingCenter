@@ -1,9 +1,27 @@
+
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import org.json.*;
+
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -52,10 +70,14 @@ public class MainScreen extends JFrame implements WindowListener{
     private JButton cancelAlbumButton;
     private JTabbedPane tabbedPanel;
     private JScrollPane resultsScrollPane;
+    private JButton lookUpMovieButton;
+    private JTextField imdbIDTF;
+    private JButton closeButton;
+    private JButton viewIMDBInfoButton;
+    private JButton lookUpBookButton;
 
     dbAccess mainDB;
     int updateID;
-
 
     MainScreen(){
         //set up window
@@ -64,7 +86,7 @@ public class MainScreen extends JFrame implements WindowListener{
         setTitle("Media Tracking Center");
         addWindowListener(this);
 
-        setSize(new Dimension(500, 400));
+        setSize(new Dimension(500, 500));
         setLocation(500,200);
 
         setVisible(true);
@@ -149,7 +171,8 @@ public class MainScreen extends JFrame implements WindowListener{
                 int currentRow = resultsJT.getSelectedRow();
 
                 if (currentRow == -1) {      // -1 means no row is selected. Display error message.
-                    JOptionPane.showMessageDialog(rootPane, "Please choose a record to delete");
+                    JOptionPane.showMessageDialog(rootPane, "Please choose a record to update.");
+                    return;
                 }
 
                 //call tab for appropriate selected media type
@@ -189,21 +212,21 @@ public class MainScreen extends JFrame implements WindowListener{
                         resultsJT.setModel(mainDB.movieDM);
                         String[] movieColumnNames = {"ID", "Movie Name","Movie Type",
                                 "Director","Genre","Description",
-                                "Actor 1","Actor 2","Actor 3", "Date Added"};
+                                "Actor 1","Actor 2","Actor 3","IMDB ID", "Date Added"};
                         for(int i=0;i<movieColumnNames.length;i++){
                             resultsJT.getColumnModel().getColumn(i).setHeaderValue(movieColumnNames[i]);
                         }
-                        setSize(new Dimension(800, 400));
+                        setSize(new Dimension(800, 500));
                         break;
                     case "Book":
                         mainDB.searchBooks(searchText,searchGenre);
                         resultsJT.setModel(mainDB.bookDM);
                         String[] bookColumnNames = {"ID", "Book Name","Author",
-                                "Genre","ISBN","Description","Date Added"};
+                                "Genre","Description","ISBN","Date Added"};
                         for(int i=0;i<bookColumnNames.length;i++){
                             resultsJT.getColumnModel().getColumn(i).setHeaderValue(bookColumnNames[i]);
                         }
-                        setSize(new Dimension(650, 400));
+                        setSize(new Dimension(650, 500));
                         break;
                     case "Album":
                         mainDB.searchAlbums(searchText,searchGenre);
@@ -213,7 +236,7 @@ public class MainScreen extends JFrame implements WindowListener{
                         for(int i=0;i<albumColumnNames.length;i++){
                             resultsJT.getColumnModel().getColumn(i).setHeaderValue(albumColumnNames[i]);
                         }
-                        setSize(new Dimension(500, 400));
+                        setSize(new Dimension(500, 500));
                         break;
                 }
             }
@@ -227,6 +250,7 @@ public class MainScreen extends JFrame implements WindowListener{
 
                 if (currentRow == -1) {      // -1 means no row is selected. Display error message.
                     JOptionPane.showMessageDialog(rootPane, "Please choose a record to delete");
+                    return;
                 }
                 //call the delete function
                 boolean deleted=false;
@@ -247,6 +271,18 @@ public class MainScreen extends JFrame implements WindowListener{
 
                 if (!deleted) {
                     JOptionPane.showMessageDialog(rootPane, "Error deleting record");
+                }
+            }
+        });
+
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int quit = JOptionPane.showConfirmDialog(MainScreen.this,"Close tracker?",
+                        "Close",JOptionPane.OK_CANCEL_OPTION);
+                if(quit==JOptionPane.OK_OPTION) {
+                    mainDB.shutdown();
+                    System.exit(0);
                 }
             }
         });
@@ -280,7 +316,7 @@ public class MainScreen extends JFrame implements WindowListener{
             public void actionPerformed(ActionEvent e) {
                 String fMovieName = movieNameTF.getText();
                 if(fMovieName.length()==0){
-                    System.out.println("Please enter a movie name!");
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter a movie name!");
                     return;
                 }
                 String fMovieType = movieTypeCB.getSelectedItem().toString();
@@ -290,18 +326,19 @@ public class MainScreen extends JFrame implements WindowListener{
                 String fActor1 = actor1TF.getText();
                 String fActor2 = actor2TF.getText();
                 String fActor3 = actor3TF.getText();
+                String fIMDBID = imdbIDTF.getText();
                 java.util.Date date = new java.util.Date();
                 Date fDateAdded = new java.sql.Date(date.getTime());
 
                 if(updateID==-1){
                     //new record
                     mainDB.movieDM.insertRow(fMovieName,fMovieType,fDirector,fGenre,
-                            fDescription,fActor1,fActor2,fActor3,fDateAdded);
+                            fDescription,fActor1,fActor2,fActor3, fIMDBID,fDateAdded);
                 }
                 else{
                     //update existing record
                     mainDB.movieDM.updateRow(updateID,fMovieName,fMovieType,fDirector,
-                            fGenre,fDescription,fActor1,fActor2,fActor3);
+                            fGenre,fDescription,fActor1,fActor2,fActor3, fIMDBID);
                 }
 
                 clearMovieData();
@@ -314,7 +351,7 @@ public class MainScreen extends JFrame implements WindowListener{
             public void actionPerformed(ActionEvent e) {
                 String fBookName = bookNameTF.getText();
                 if(fBookName.length()==0){
-                    System.out.println("Please enter a book name!");
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter a book name!");
                     return;
                 }
                 String fAuthor = authorTF.getText();
@@ -343,12 +380,12 @@ public class MainScreen extends JFrame implements WindowListener{
             public void actionPerformed(ActionEvent e) {
                 String fAlbumName = albumNameTF.getText();
                 if(fAlbumName.length()==0){
-                    System.out.println("Please enter a album name!");
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter a album name!");
                     return;
                 }
                 String fArtist = artistTF.getText();
                 if(fArtist.length()==0){
-                    System.out.println("Please enter an artist!");
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter an artist!");
                     return;
                 }
                 String fGenre = albumGenreCB.getSelectedItem().toString();
@@ -370,6 +407,172 @@ public class MainScreen extends JFrame implements WindowListener{
             }
         });
 
+        lookUpMovieButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fMovieName = movieNameTF.getText();
+                if(fMovieName.length()==0){
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter a movie name!");
+                    return;
+                }
+
+
+                //set up http post call
+                HttpClient httpClient = new DefaultHttpClient();
+                try {
+                    String encodedMovieName = URLEncoder.encode(fMovieName,"UTF-8");
+
+                    //call omdb api for movie info based upon title
+                    String url="http://www.omdbapi.com/?t="+encodedMovieName;
+                    HttpPost request = new HttpPost(url);
+                    //get and parse response
+                    HttpResponse response = httpClient.execute(request);
+                    String jsonString = EntityUtils.toString(response.getEntity());
+                    JSONObject obj = new JSONObject(jsonString);
+                    String jDirector = obj.getString("Director");
+                    String jIMDBID = obj.getString("imdbID");
+                    String jActors = obj.getString("Actors");
+                    String[] aActors = jActors.split(",");
+                    String jDescription = obj.getString("Plot");
+                    String jTitle = obj.getString("Title");
+
+                    //assign values to fields
+                    movieNameTF.setText(jTitle);
+                    directorTF.setText(jDirector);
+                    imdbIDTF.setText(jIMDBID);
+                    actor1TF.setText(aActors[0]);
+                    if(aActors.length>1){actor2TF.setText(aActors[1]);}
+                    if(aActors.length>2){actor3TF.setText(aActors[2]);}
+                    if(jDescription.length()>1000){
+                        movieDescriptionTF.setText(jDescription.substring(0,999));}
+                    else{
+                        movieDescriptionTF.setText(jDescription);
+                    }
+
+
+                }catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                } finally {
+                    httpClient.getConnectionManager().shutdown();
+                }
+            }
+        });
+
+        viewIMDBInfoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String iIMDBID = imdbIDTF.getText();
+
+                if(iIMDBID.length()<5) {
+                    JOptionPane.showMessageDialog(MainScreen.this, "IMDB ID needs to be looked up first!");
+                    return;
+                }
+
+                try {
+                    URL sIMDBURL = new URL("http://www.imdb.com/title/"+iIMDBID+"/");
+                    openWebpage(sIMDBURL.toURI());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
+
+        lookUpBookButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fISBN = isbnTF.getText();
+                if(fISBN.length()==0){
+                    JOptionPane.showMessageDialog(MainScreen.this,"Please enter an ISBN value!");
+                    return;
+                }
+
+                String apiKey="";
+                //look up access key
+                try (BufferedReader reader = new BufferedReader(new FileReader("key.txt"))){
+                    apiKey = reader.readLine();
+                }
+                catch (IOException ex){
+                    System.out.println(ex);
+                }
+
+                //set up http post call
+                HttpClient httpClient = new DefaultHttpClient();
+                try {
+                    //call googlebooks api for book info based upon isbn
+                    String url="https://www.googleapis.com/books/v1/volumes?q=isbn:"+fISBN+"&key="+apiKey;
+
+                    //Need to set up ssl authentication for correct call
+                    SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                    URL myurl = new URL(url);
+                    HttpsURLConnection conn = (HttpsURLConnection)myurl.openConnection();
+                    conn.setSSLSocketFactory(sslsocketfactory);
+                    InputStream inputstream = conn.getInputStream();
+                    InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
+                    BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
+
+                    //get json response
+                    String jsonString="";
+                    String string = null;
+                    while ((string = bufferedreader.readLine()) != null) {
+                        jsonString+=string;
+                    }
+
+                    //parse json object
+                    JSONObject obj = new JSONObject(jsonString);
+                    JSONArray itemArray = obj.getJSONArray("items");
+                    JSONObject volumes =null;
+                    int len = itemArray.length();
+
+                    for(int j=0; j<len; j++) {
+                        JSONObject json = itemArray.getJSONObject(j);
+                        volumes = json.getJSONObject("volumeInfo");
+                    }
+
+                    String jBookName = "";
+                    String jAuthor = "";
+                    String jDescription = "";
+
+                    jBookName = volumes.getString("title");
+                    JSONArray authorsArray = volumes.getJSONArray("authors");
+                    len = authorsArray.length();
+
+                    for(int j=0; j<len; j++) {
+                        jAuthor += authorsArray.getString(j)+",";
+                    }
+                    jAuthor = jAuthor.substring(0,jAuthor.length()-1);
+                    jDescription = volumes.getString("description");
+
+                    //assign results
+                    bookNameTF.setText(jBookName);
+                    authorTF.setText(jAuthor);
+                    if(jDescription.length()>1000){
+                        bookDescriptionTF.setText(jDescription.substring(0,999));}
+                    else{
+                        bookDescriptionTF.setText(jDescription);
+                    }
+
+                }catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                } finally {
+                    httpClient.getConnectionManager().shutdown();
+                }
+            }
+        });
+
+    }
+
+    //Try to load the uri using the default pc browser
+    public static void openWebpage(URI uri) {
+
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            try {
+                desktop.browse(uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //populate fields with selected record

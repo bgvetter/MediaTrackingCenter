@@ -87,10 +87,11 @@ public class dbAccess {
                             "MovieType VARCHAR (10), " +
                             "Director VARCHAR (100), " +
                             "Genre varchar(50), " +
-                            "Description VARCHAR (250), " +
+                            "Description VARCHAR (1000), " +
                             "Actor1 VARCHAR (100), " +
                             "Actor2 VARCHAR (100), " +
                             "Actor3 VARCHAR (100), " +
+                            "IMDBID VARCHAR (50), " +
                             "DateAdded DateTime," +
                             "PRIMARY KEY(ID) " +
                             ")";
@@ -105,7 +106,7 @@ public class dbAccess {
                             "BookName VARCHAR (100), " +
                             "Author VARCHAR (100), " +
                             "Genre varchar(50), " +
-                            "Description VARCHAR (250), " +
+                            "Description VARCHAR (1000), " +
                             "ISBN VARCHAR (15), " +
                             "DateAdded DateTime, " +
                             "PRIMARY KEY(ID) " +
@@ -121,7 +122,7 @@ public class dbAccess {
                             "AlbumName VARCHAR (100), " +
                             "Artist VARCHAR (100), " +
                             "Genre varchar(50), " +
-                            "Description VARCHAR (250), " +
+                            "Description VARCHAR (1000), " +
                             "DateAdded DateTime, " +
                             "PRIMARY KEY(ID) " +
                             ")";
@@ -158,8 +159,9 @@ public class dbAccess {
                         "Actor1," +
                         "Actor2," +
                         "Actor3," +
+                        "IMDBID," +
                         "DateAdded) " +
-                        "values(?,?,?,?,?,?,?,?,?)";
+                        "values(?,?,?,?,?,?,?,?,?,?)";
                 psInsert = conn.prepareStatement(sPreparedSQL);
 
                 //insert data
@@ -171,8 +173,9 @@ public class dbAccess {
                 psInsert.setString(6,"Jeff Bridges");
                 psInsert.setString(7,"");
                 psInsert.setString(8,"");
+                psInsert.setString(9,"");
                 java.util.Date date = new java.util.Date();
-                psInsert.setDate(9,new java.sql.Date(date.getTime()));
+                psInsert.setDate(10,new java.sql.Date(date.getTime()));
                 psInsert.executeUpdate();
 
             }

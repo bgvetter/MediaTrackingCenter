@@ -100,7 +100,7 @@ public class movieDataModel extends AbstractTableModel  {
     //returns true if successful, false if error occurs
     public boolean insertRow(String iMovieName, String iMovieType, String iDirector,
                              String iGenre, String iDescription, String iActor1, String iActor2,
-                             String iActor3, Date iDateAdded) {
+                             String iActor3, String iIMDBID, Date iDateAdded) {
 
         try {
             //Move to insert row, insert the appropriate data in each column, insert the row, move cursor back to where it was before we started
@@ -113,6 +113,7 @@ public class movieDataModel extends AbstractTableModel  {
             resultSet.updateString("Actor1", iActor1);
             resultSet.updateString("Actor2", iActor2);
             resultSet.updateString("Actor3", iActor3);
+            resultSet.updateString("IMDBID", iIMDBID);
             Date date = iDateAdded;
             resultSet.updateDate("DateAdded", (java.sql.Date) date);
 
@@ -132,7 +133,7 @@ public class movieDataModel extends AbstractTableModel  {
     //updates an existing record in the recordset
     public boolean updateRow(int rowID, String iMovieName, String iMovieType, String iDirector,
                              String iGenre, String iDescription, String iActor1, String iActor2,
-                             String iActor3) {
+                             String iActor3, String iIMDBID) {
 
         try {
             resultSet.absolute(rowID+1);
@@ -144,6 +145,7 @@ public class movieDataModel extends AbstractTableModel  {
             resultSet.updateString("Actor1", iActor1);
             resultSet.updateString("Actor2", iActor2);
             resultSet.updateString("Actor3", iActor3);
+            resultSet.updateString("IMDBID", iIMDBID);
             resultSet.updateRow();
             fireTableDataChanged();
             return true;
