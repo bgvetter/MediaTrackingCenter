@@ -15,7 +15,7 @@ public class dbAccess {
     private static final String DB_CONNECTION_URL = "jdbc:mysql://localhost:3306/";     //Connection string – where's the database?
     private static final String USER = "bradv";
     private static final String DB_NAME = "mediaTracking";
-    private static final String PASSWORD = System.getenv("MYSQLPW");
+    private static final String PASSWORD = "mediaTracking";
     static Statement statement = null;
     static Connection conn = null;
     static ResultSet rsMovies = null;
