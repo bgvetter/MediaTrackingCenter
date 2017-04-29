@@ -111,9 +111,8 @@ public class albumDataModel extends AbstractTableModel {
             resultSet.updateString("Genre", iGenre);
             resultSet.updateString("Description", iDescription);
             resultSet.updateString("AlbumURL", iURL);
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
-            resultSet.updateDate("DateAdded", (java.sql.Date) date);
+            resultSet.updateDate("DateAdded", new java.sql.Date(date.getTime()));
 
             resultSet.insertRow();
             resultSet.moveToCurrentRow();

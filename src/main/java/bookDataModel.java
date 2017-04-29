@@ -111,9 +111,8 @@ public class bookDataModel extends AbstractTableModel {
             resultSet.updateString("Genre", iGenre);
             resultSet.updateString("Description", iDescription);
             resultSet.updateString("ISBN", iISBN);
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
-            resultSet.updateDate("DateAdded", (java.sql.Date) date);
+            resultSet.updateDate("DateAdded", new java.sql.Date(date.getTime()));
 
             resultSet.insertRow();
             resultSet.moveToCurrentRow();

@@ -147,20 +147,23 @@ public class MainScreen extends JFrame implements WindowListener{
             public void actionPerformed(ActionEvent e) {
                 //call tab for appropriate selected media type
 
-                String searchMediaType = searchMediaTypeCB.getSelectedItem().toString();
+                String searchMediaType = mediaTypeCB.getSelectedItem().toString();
                 //set update id to -1 for new
                 updateID = -1;
 
                 switch (searchMediaType){
                     case "Movie":
+                        mainDB.searchMovies("","Search All");
                         clearMovieData();
                         switchTabs(1,0);
                         break;
                     case "Book":
+                        mainDB.searchBooks("","Search All");
                         clearBookData();
                         switchTabs(2,0);
                         break;
                     case "Album":
+                        mainDB.searchAlbums("","Search All");
                         clearAlbumData();
                         switchTabs(3,0);
                         break;
@@ -239,7 +242,7 @@ public class MainScreen extends JFrame implements WindowListener{
                         for(int i=0;i<albumColumnNames.length;i++){
                             resultsJT.getColumnModel().getColumn(i).setHeaderValue(albumColumnNames[i]);
                         }
-                        setSize(new Dimension(500, 500));
+                        setSize(new Dimension(500, 550));
                         break;
                 }
             }

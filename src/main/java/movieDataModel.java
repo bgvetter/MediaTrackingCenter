@@ -114,8 +114,8 @@ public class movieDataModel extends AbstractTableModel  {
             resultSet.updateString("Actor2", iActor2);
             resultSet.updateString("Actor3", iActor3);
             resultSet.updateString("IMDBID", iIMDBID);
-            Date date = iDateAdded;
-            resultSet.updateDate("DateAdded", (java.sql.Date) date);
+            Date date = new Date();
+            resultSet.updateDate("DateAdded", new java.sql.Date(date.getTime()));
 
             resultSet.insertRow();
             resultSet.moveToCurrentRow();
