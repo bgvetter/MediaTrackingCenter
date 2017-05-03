@@ -82,6 +82,11 @@ public class MainScreen extends JFrame implements WindowListener{
     dbAccess mainDB;
     int updateID;
 
+    final int mainForm = 0;
+    final int movieForm = 1;
+    final int bookForm = 2;
+    final int albumForm = 3;
+
     MainScreen(){
         //set up window
         setContentPane(rootPanel);
@@ -155,17 +160,17 @@ public class MainScreen extends JFrame implements WindowListener{
                     case "Movie":
                         mainDB.searchMovies("","Search All");
                         clearMovieData();
-                        switchTabs(1,0);
+                        switchTabs(movieForm,mainForm);
                         break;
                     case "Book":
                         mainDB.searchBooks("","Search All");
                         clearBookData();
-                        switchTabs(2,0);
+                        switchTabs(bookForm,mainForm);
                         break;
                     case "Album":
                         mainDB.searchAlbums("","Search All");
                         clearAlbumData();
-                        switchTabs(3,0);
+                        switchTabs(albumForm,mainForm);
                         break;
                 }
             }
@@ -189,15 +194,15 @@ public class MainScreen extends JFrame implements WindowListener{
                 switch (searchMediaType){
                     case "Movie":
                         setMovieData(currentRow);
-                        switchTabs(1,0);
+                        switchTabs(movieForm,mainForm);
                         break;
                     case "Book":
                         setBookData(currentRow);
-                        switchTabs(2,0);
+                        switchTabs(bookForm,mainForm);
                         break;
                     case "Album":
                         setAlbumData(currentRow);
-                        switchTabs(3,0);
+                        switchTabs(albumForm,mainForm);
                         break;
                 }
             }
@@ -297,7 +302,7 @@ public class MainScreen extends JFrame implements WindowListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearBookData();
-                switchTabs(0,2);
+                switchTabs(mainForm,bookForm);
             }
         });
 
@@ -305,7 +310,7 @@ public class MainScreen extends JFrame implements WindowListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearMovieData();
-                switchTabs(0,1);
+                switchTabs(mainForm,movieForm);
             }
         });
 
@@ -313,7 +318,7 @@ public class MainScreen extends JFrame implements WindowListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearAlbumData();
-                switchTabs(0,3);
+                switchTabs(mainForm,albumForm);
             }
         });
 
@@ -348,7 +353,7 @@ public class MainScreen extends JFrame implements WindowListener{
                 }
 
                 clearMovieData();
-                switchTabs(0,1);
+                switchTabs(mainForm,movieForm);
             }
         });
 
@@ -377,7 +382,7 @@ public class MainScreen extends JFrame implements WindowListener{
                 }
 
                 clearMovieData();
-                switchTabs(0,2);
+                switchTabs(mainForm,bookForm);
             }
         });
 
@@ -410,7 +415,7 @@ public class MainScreen extends JFrame implements WindowListener{
                 }
 
                 clearMovieData();
-                switchTabs(0,3);
+                switchTabs(mainForm,albumForm);
             }
         });
 
