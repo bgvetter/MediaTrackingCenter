@@ -14,6 +14,7 @@ public class dbAccess {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";        //Configure the driver needed
     private static final String DB_CONNECTION_URL = "jdbc:mysql://localhost:3306/";     //Connection string – where's the database?
     private static final String USER = "bradv";
+    private static final String macCS = "?useLegacyDatetimeCode=false&serverTimezone=America/Chicago";
     private static final String DB_NAME = "mediaTracking";
     private static final String PASSWORD = "mediaTracking";
     static Statement statement = null;
@@ -41,7 +42,7 @@ public class dbAccess {
 
         //create the connection and statement object for running queries
         try{
-            conn = DriverManager.getConnection(DB_CONNECTION_URL + DB_NAME, USER, PASSWORD);
+            conn = DriverManager.getConnection(DB_CONNECTION_URL + DB_NAME + macCS, USER, PASSWORD);
             statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);}
         catch (SQLException se){
             se.printStackTrace();
