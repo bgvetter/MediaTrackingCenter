@@ -158,16 +158,19 @@ public class MainScreen extends JFrame implements WindowListener{
 
                 switch (searchMediaType){
                     case "Movie":
+                        //set up a recordset for use in controlling data
                         mainDB.searchMovies("","Search All");
                         clearMovieData();
                         switchTabs(movieForm,mainForm);
                         break;
                     case "Book":
+                        //set up a recordset for use in controlling data
                         mainDB.searchBooks("","Search All");
                         clearBookData();
                         switchTabs(bookForm,mainForm);
                         break;
                     case "Album":
+                        //set up a recordset for use in controlling data
                         mainDB.searchAlbums("","Search All");
                         clearAlbumData();
                         switchTabs(albumForm,mainForm);

@@ -73,6 +73,7 @@ public class dbAccess {
         genreAL.add("Philosophy");
         genreAL.add("Drama");
         genreAL.add("Pop");
+        genreAL.add("Children");
 
         Collections.sort(genreAL);
     }
